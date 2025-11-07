@@ -1,9 +1,9 @@
-html, body {
-  overflow: hidden;;
+html, body{
+  overflow: hidden;
   background-image: url('ege.png');
   background-repeat: no-repeat;
   background-size: cover;
-  background-color: rgb(2, 2, 5);
+  background-color: rgb(8, 8, 29);
 }
 canvas {
   display: block;
