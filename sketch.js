@@ -1,36 +1,52 @@
 let img;
-let audioloop; 
+let audioLop; 
 
 function preload() {
-  audioloop = loadSound("srcRWR.mp3");
-  img = loadImage("rwr.gif");
+    img = loadImage("rwr.gif");
+    audioLoop = loadSound('srcRWR.mp3');
 }
 
+
 function setup() {
-  let canvasWidth = min(windowWidth, windowHeight);
-  let canvasHeight = canvasWidth; 
+    let canvasWidth = min(windowWidth, windowHeight);
+    let canvasHeight = canvasWidth; 
     
     
-  if (canvasHeight > windowHeight) {
+    if (canvasHeight > windowHeight) {
         canvasHeight = windowHeight;
         canvasWidth = canvasHeight;
-  }
-  createCanvas(canvasWidth, canvasHeight);
+    }
+    createCanvas(canvasWidth, canvasHeight);
 
-  audioLoop.loop(); 
-  audioLoop.setVolume(0.7); 
+    showDebug();
+
+    lockGestures();
+
+    audioLoop.loop(); 
+
+    enableSoundTap();
+
+    audioLoop.setVolume(0.7); 
 }
 
 function draw() {
-  background(220);
-  let scaleX = width / img.width;
-  let scaleY = height / img.height;
-  let scale = max(scaleX, scaleY);
+    background(0);
+    let scaleX = width / img.width;
+    let scaleY = height / img.height;
+    let scale = max(scaleX, scaleY);
         
        
-  let scaledWidth = img.width * scale;
-  let scaledHeight = img.height * scale;
-  let x = (width - scaledWidth) / 2;
-  let y = (height - scaledHeight) / 2;    
-  image(img, x, y, scaledWidth, scaledHeight);
+    let scaledWidth = img.width * scale;
+    let scaledHeight = img.height * scale;
+    let x = (width - scaledWidth) / 2;
+    let y = (height - scaledHeight) / 2;    
+    image(img, x, y, scaledWidth, scaledHeight);
+}
+
+function touchStarted() {
+    return false; 
+}
+
+function touchEnded() {
+  return false;
 }

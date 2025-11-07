@@ -1,9 +1,14 @@
 html, body {
   overflow: hidden;;
+  background-image: url('ege.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-color: rgb(2, 2, 5);
 }
 canvas {
   display: block;
+}
+
+img[src$="rwr.gif"] { 
+  padding: 10px;
 }
