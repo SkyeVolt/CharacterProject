@@ -16,7 +16,7 @@ function setup() {
         canvasHeight = windowHeight;
         canvasWidth = canvasHeight;
     }
-    createCanvas(canvasWidth, canvasHeight);
+    createCanvas(canvasWidth / 2.5, canvasHeight / 2.5);
 
     showDebug();
 

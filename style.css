@@ -1,6 +1,6 @@
 html, body{
   overflow: hidden;
-  background-image: url('ege.png');
+  background-image: url('egeh.gif');
   background-repeat: no-repeat;
   background-size: cover;
   background-color: rgb(8, 8, 29);
@@ -10,5 +10,5 @@ canvas {
 }
 
 img[src$="rwr.gif"] { 
-  padding: 10px;
+  padding: 100px;
 }
