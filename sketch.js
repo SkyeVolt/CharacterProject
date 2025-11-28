@@ -85,10 +85,24 @@ function draw() {
     let scaleY = height / img.height;
     let scale = max(scaleX, scaleY);
         
+        
     let scaledWidth = img.width * scale;
     let scaledHeight = img.height * scale;
     let x = (width - scaledWidth) / 2;
     let y = (height - scaledHeight) / 2;    
+
+
+    if (DRIFT_SPEED > 0) {
+        targetValue = lerp(targetValue, DEFAULT_VALUE, DRIFT_SPEED);
+    } 
+  
+    currentValue = lerp(currentValue, targetValue, 0.1);
+  
+
+    if (touchFeedback > 0) {
+        touchFeedback -= 0.05;
+    }
+
 
 
     if (DRIFT_SPEED > 0) {
