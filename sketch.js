@@ -27,6 +27,7 @@ let lockThreshold = 30;
 
 function preload() {
     img = loadImage("rwr.gif");
+    vwrFlare = loadsound('vwrFlare.mp3')
     audioSrc = loadSound('srcRWR.mp3');
     audioSrcExt = loadSound('srcRWRext.mp3');
     audioTrk = loadSound('trkRWR.mp3');
