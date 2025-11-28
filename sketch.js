@@ -8,7 +8,7 @@ let DEFAULT_COUNT_DIRECTION = 1;
 let INCREMENT_PER_TOUCH = 20;   
 let TOUCH_IS_POSITIVE = true;   
 
-let DEFAULT_VALUE = 10;
+let DEFAULT_VALUE = 25;
 let DRIFT_SPEED = 0.005;
 
 let SHOW_DRIFT = true;
@@ -27,7 +27,7 @@ let lockThreshold = 30;
 
 function preload() {
     img = loadImage("rwr.gif");
-    vwrFlare = loadsound('vwrFlare.mp3')
+    vwrFlare = loadSound('vwrFlare.mp3');
     audioSrc = loadSound('srcRWR.mp3');
     audioSrcExt = loadSound('srcRWRext.mp3');
     audioTrk = loadSound('trkRWR.mp3');
@@ -58,30 +58,56 @@ function setup() {
     audioTrk.setVolume(0.7); 
     audioLock.setVolume(0.7); 
 
-    textAlign(CENTER, CENTER);
-}
-
-function audioCheck() {
-
     audioSrc.pause(); 
     audioSrcExt.pause(); 
     audioTrk.pause(); 
     audioLock.pause(); 
 
+    textAlign(CENTER, CENTER);
+}
+
+function audioCheck() {
     if (targetValue >= srcThreshold) {
-        audioSrc.loop();
+        if (window.soundEnabled && !audioSrc.isPlaying()) {
+            audioSrc.play();
+
+            audioSrcExt.pause(); 
+            audioTrk.pause(); 
+            audioLock.pause(); 
+        }
     } else if (targetValue <= srcThreshold && targetValue >= trkThreshold) {
-        audioSrcExt.loop();
-    } else if (targetValue <= trkThreshold && targetValue >= lockThreshold) {
-        audioTrk.loop();
+       if (window.soundEnabled && !audioSrcExt.isPlaying()) {
+            audioSrcExt.play();
+
+            audioSrc.pause(); 
+            audioTrk.pause(); 
+            audioLock.pause(); 
+        }
+    } else if (targetValue <= trkThreshold && targetValue >= lockThreshold) {     
+        if (window.soundEnabled && !audioTrk.isPlaying()) {
+            audioTrk.play();
+
+            audioSrc.pause(); 
+            audioSrcExt.pause(); 
+            audioLock.pause(); 
+        }
     } else if (targetValue <= lockThreshold) {
-        audioLock.loop();
+        if (window.soundEnabled && !audioLock.isPlaying()) {
+            audioLock.play();
+            
+            if (!vwrFlare.isPlaying()) {
+                vwrFlare.play();
+            }
+
+            audioSrc.pause(); 
+            audioSrcExt.pause(); 
+            audioTrk.pause(); 
+        }
     }
 }
 
 function draw() {
     background(0);
-    debug("--- Something: ---");
     let scaleX = width / img.width;
     let scaleY = height / img.height;
     let scale = max(scaleX, scaleY);
@@ -119,7 +145,6 @@ function draw() {
 }
 
 function touchStarted() {
-    debug("--- Touch: Flare---");
     audioFlare.play(); 
 
     let touchCount = touches.length > 0 ? touches.length : 1;
@@ -144,6 +169,7 @@ function touchEnded() {
 }
 
 function drawInfo() {
+    
     colorMode(HSB, 360, 100, 100);
   
     // Title
