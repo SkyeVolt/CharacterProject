@@ -8,8 +8,8 @@ let DEFAULT_COUNT_DIRECTION = 1;
 let INCREMENT_PER_TOUCH = 20;   
 let TOUCH_IS_POSITIVE = true;   
 
-let DEFAULT_VALUE = 25;
-let DRIFT_SPEED = 0.005;
+let DEFAULT_VALUE = 20;
+let DRIFT_SPEED = 0.001;
 
 let SHOW_DRIFT = true;
 
@@ -19,15 +19,18 @@ let totalTouches = 0;
 
 let touchFeedback = 0;
 
-let srcThreshold = 130;
+let srcThreshold = 180;
 let trkThreshold = 70;
 let lockThreshold = 30;
 
-
+var delayInMilliseconds1 = 2000; // 2 seconds
+var delayInMilliseconds2 = 800; // 0.8 seconds
 
 function preload() {
     img = loadImage("rwr.gif");
     vwrFlare = loadSound('vwrFlare.mp3');
+    vwrLock = loadSound('vwrLock.mp3');
+    vwrMissile = loadSound('vwrMissile.mp3');
     audioSrc = loadSound('srcRWR.mp3');
     audioSrcExt = loadSound('srcRWRext.mp3');
     audioTrk = loadSound('trkRWR.mp3');
@@ -92,12 +95,25 @@ function audioCheck() {
             audioLock.pause(); 
         }
     } else if (targetValue <= lockThreshold) {
+
+        if (window.soundEnabled && !vwrLock.isPlaying() && !audioLock.isPlaying()) {
+                vwrLock.play();
+
+                setTimeout(function() {
+                if (!vwrFlare.isPlaying()) {
+                vwrFlare.play();
+                }
+            }, delayInMilliseconds2); 
+            }
+
         if (window.soundEnabled && !audioLock.isPlaying()) {
             audioLock.play();
             
-            if (!vwrFlare.isPlaying()) {
-                vwrFlare.play();
-            }
+            setTimeout(function() {
+                if (!vwrMissile.isPlaying()) {
+                vwrMissile.play();
+                }
+            }, delayInMilliseconds1); 
 
             audioSrc.pause(); 
             audioSrcExt.pause(); 
@@ -160,7 +176,7 @@ function touchStarted() {
   
     targetValue += increment;
 
-    targetValue = constrain(targetValue, -200, 2000);
+    targetValue = constrain(targetValue, -2000, 2000);
     return false; 
 }
 
