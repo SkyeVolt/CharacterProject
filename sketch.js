@@ -76,11 +76,12 @@ function audioCheck() {
         audioTrk.loop();
     } else if (targetValue <= lockThreshold) {
         audioLock.loop();
-        vwrFlare.play(); 
     }
 }
 
 function draw() {
+    background(0);
+    debug("--- Something: ---");
     let scaleX = width / img.width;
     let scaleY = height / img.height;
     let scale = max(scaleX, scaleY);
@@ -118,6 +119,7 @@ function draw() {
 }
 
 function touchStarted() {
+    debug("--- Touch: Flare---");
     audioFlare.play(); 
 
     let touchCount = touches.length > 0 ? touches.length : 1;
