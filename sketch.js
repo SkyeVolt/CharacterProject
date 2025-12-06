@@ -4,27 +4,34 @@ let audioSrc;
 let audioTrk; 
 let audioLock; 
 let audioFlare;
+
 let DEFAULT_COUNT_DIRECTION = 1;
 let INCREMENT_PER_TOUCH = 20;   
 let TOUCH_IS_POSITIVE = true;   
 
-let DEFAULT_VALUE = 20;
-let DRIFT_SPEED = 0.001;
+let DEFAULT_VALUE = 10;
+let DRIFT_SPEED = 0.002;
 
 let SHOW_DRIFT = true;
 
 let currentValue = DEFAULT_VALUE;
-let targetValue = DEFAULT_VALUE;
+let targetValue = 100;
 let totalTouches = 0;
+let chaffAmount = 90; 
 
 let touchFeedback = 0;
 
 let srcThreshold = 180;
 let trkThreshold = 70;
 let lockThreshold = 30;
+let explodeThreshold = 11;
 
 var delayInMilliseconds1 = 2000; // 2 seconds
 var delayInMilliseconds2 = 800; // 0.8 seconds
+
+var body = document.getElementsByTagName('body')[0];
+
+let playerDead = false;
 
 function preload() {
     img = loadImage("rwr.gif");
@@ -36,6 +43,7 @@ function preload() {
     audioTrk = loadSound('trkRWR.mp3');
     audioLock = loadSound('lockRWR.mp3');
     audioFlare = loadSound('flare.mp3');
+    audioExplode = loadSound('explodeSound.mp3');
 }
 
 
@@ -65,7 +73,7 @@ function setup() {
     audioSrcExt.pause(); 
     audioTrk.pause(); 
     audioLock.pause(); 
-
+    
     textAlign(CENTER, CENTER);
 }
 
@@ -95,12 +103,11 @@ function audioCheck() {
             audioLock.pause(); 
         }
     } else if (targetValue <= lockThreshold) {
-
         if (window.soundEnabled && !vwrLock.isPlaying() && !audioLock.isPlaying()) {
                 vwrLock.play();
 
                 setTimeout(function() {
-                if (!vwrFlare.isPlaying()) {
+                if (!vwrFlare.isPlaying() && playerDead == false) {
                 vwrFlare.play();
                 }
             }, delayInMilliseconds2); 
@@ -110,7 +117,7 @@ function audioCheck() {
             audioLock.play();
             
             setTimeout(function() {
-                if (!vwrMissile.isPlaying()) {
+                if (!vwrMissile.isPlaying() && playerDead == false) {
                 vwrMissile.play();
                 }
             }, delayInMilliseconds1); 
@@ -118,6 +125,15 @@ function audioCheck() {
             audioSrc.pause(); 
             audioSrcExt.pause(); 
             audioTrk.pause(); 
+        }
+        
+        if (targetValue <= explodeThreshold) {
+            body.style.backgroundImage = 'url(explode.gif)';
+            if (!audioExplode.isPlaying() && playerDead == false) {
+                audioExplode.play();
+
+                playerDead = true;
+            }
         }
     }
 }
@@ -157,27 +173,28 @@ function draw() {
     image(img, x, y, scaledWidth, scaledHeight);
     
     drawInfo();
-    audioCheck();
+    audioCheck(); 
 }
 
 function touchStarted() {
-    audioFlare.play(); 
+    if (playerDead == false && chaffAmount >= 0) {
+        audioFlare.play(); 
 
-    let touchCount = touches.length > 0 ? touches.length : 1;
+        let touchCount = touches.length > 0 ? touches.length : 1;
   
-    totalTouches += touchCount;
-    touchFeedback = 1.0;
+        totalTouches += touchCount;
+        touchFeedback = 1.0;
   
-    let increment = INCREMENT_PER_TOUCH * touchCount * DEFAULT_COUNT_DIRECTION;
-  
-    if (!TOUCH_IS_POSITIVE) {
-        increment = -increment;
-    }
-  
-    targetValue += increment;
+        let increment = INCREMENT_PER_TOUCH * touchCount * DEFAULT_COUNT_DIRECTION;
+    
+        if (!TOUCH_IS_POSITIVE) {
+            increment = -increment;
+        }
+    
+        targetValue += increment;
 
-    targetValue = constrain(targetValue, -2000, 2000);
-    return false; 
+        targetValue = constrain(targetValue, -2000, 2000);
+    } return false; 
 }
 
 function touchEnded() {
@@ -189,16 +206,29 @@ function drawInfo() {
     colorMode(HSB, 360, 100, 100);
   
     // Title
-    fill(0, 0, 90);
-    noStroke();
-    textSize(24);
-    textAlign(CENTER, CENTER);
-    text("Radar Warning Reciever", width / 2, 50);
-  
+    if (playerDead == true) {
+        fill(0, 0, 90);
+        noStroke();
+        textSize(24);
+        textAlign(CENTER, CENTER);
+        text("Aircraft Shot Down!", width / 2, 50);
+    } else {
+        fill(0, 0, 90);
+        noStroke();
+        textSize(24);
+        textAlign(CENTER, CENTER);
+        text("Radar Warning Reciever", width / 2, 50);
+    } 
     // Instructions
-    textSize(16);
-    fill(0, 0, 80);
-    text("Tap to Deploy Counter-measures!", width / 2, 85);
+    if (playerDead == true) {
+        textSize(16);
+        fill(0, 0, 80);
+        text("Refresh the page to restart!", width / 2, 85);
+    } else {
+        textSize(16);
+        fill(0, 0, 80);
+        text("Tap to deploy counter-measures!", width / 2, 85);
+    } 
   
     // Display parameters and stats
     textAlign(LEFT, CENTER);
@@ -206,17 +236,15 @@ function drawInfo() {
     fill(0, 0, 70);
   
     let x = 20;
-    let y = height - 90;
+    let y = height - 74;
   
     text("STATS:", x, y);
     y += 18;
-    text("Total Chaff Deployed: " + totalTouches, x, y);
+    text("Chaff: " + (chaffAmount - totalTouches), x, y);
     y += 16;
-    text("Current: " + floor(currentValue), x, y);
+    text("Notch: " + floor(currentValue), x, y);
     y += 16;
-    text("Target: " + floor(targetValue), x, y);
-    y += 16;
-    text("Default: " + DEFAULT_VALUE, x, y);
+    text("Stay above 130!", x, y);
   
     textAlign(RIGHT, CENTER);
     let x2 = width - 20;
@@ -224,7 +252,7 @@ function drawInfo() {
   
     let increment = INCREMENT_PER_TOUCH * (TOUCH_IS_POSITIVE ? 1 : -1) * DEFAULT_COUNT_DIRECTION;
   
-    text("DEBUG:", x2, y2);
+    /*text("DEBUG:", x2, y2);
     y2 += 18;
     text("Increment: " + increment, x2, y2);
     y2 += 16;
@@ -236,5 +264,6 @@ function drawInfo() {
 
     textAlign(CENTER, CENTER);
     textSize(11);
-    fill(0, 0, 60);
+    fill(0, 0, 60);*/ 
 }
+
