@@ -24,7 +24,7 @@ let touchFeedback = 0;
 let srcThreshold = 180;
 let trkThreshold = 70;
 let lockThreshold = 30;
-let explodeThreshold = 11;
+let explodeThreshold = 15;
 
 var delayInMilliseconds1 = 2000; // 2 seconds
 var delayInMilliseconds2 = 800; // 0.8 seconds
@@ -177,23 +177,26 @@ function draw() {
 }
 
 function touchStarted() {
-    if (playerDead == false && chaffAmount >= 0) {
-        audioFlare.play(); 
+    if (playerDead == false) {
+        if (chaffAmount > 0) { 
+            audioFlare.play(); 
 
-        let touchCount = touches.length > 0 ? touches.length : 1;
-  
-        totalTouches += touchCount;
-        touchFeedback = 1.0;
-  
-        let increment = INCREMENT_PER_TOUCH * touchCount * DEFAULT_COUNT_DIRECTION;
+            let touchCount = touches.length > 0 ? touches.length : 1;
     
-        if (!TOUCH_IS_POSITIVE) {
-            increment = -increment;
+            totalTouches += touchCount;
+            chaffAmount--; 
+            touchFeedback = 1.0;
+    
+            let increment = INCREMENT_PER_TOUCH * touchCount * DEFAULT_COUNT_DIRECTION;
+        
+            if (!TOUCH_IS_POSITIVE) {
+                increment = -increment;
+            }
+        
+            targetValue += increment;
+
+            targetValue = constrain(targetValue, -2000, 2000);
         }
-    
-        targetValue += increment;
-
-        targetValue = constrain(targetValue, -2000, 2000);
     } return false; 
 }
 
@@ -240,7 +243,7 @@ function drawInfo() {
   
     text("STATS:", x, y);
     y += 18;
-    text("Chaff: " + (chaffAmount - totalTouches), x, y);
+    text("Chaff: " + (chaffAmount), x, y);
     y += 16;
     text("Notch: " + floor(currentValue), x, y);
     y += 16;
